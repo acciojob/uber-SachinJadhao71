@@ -5,40 +5,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Driver{
-
-
+public class Driver {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int DriverId;
-
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    private int driverId;
     private String mobile;
-
     private String password;
 
-    @OneToOne
-    @JoinColumn
-    Cab cab;
+    @OneToOne(mappedBy = "driver",cascade = CascadeType.ALL)
+    private Cab cab;
 
-    @OneToMany
-    List<TripBooking> tripList = new ArrayList<>();
-
+    @OneToMany(mappedBy = "driver",cascade = CascadeType.ALL)
+    private List<TripBooking> tripBookingList = new ArrayList<>();
 
     public Driver() {
     }
 
-    public Driver(int driverId, String mobile, String password) {
-        DriverId = driverId;
+    public Driver(int driverId, String mobile, String password, Cab cab, List<TripBooking> tripBookins) {
+        this.driverId = driverId;
         this.mobile = mobile;
         this.password = password;
+        this.cab = cab;
+        this.tripBookingList = tripBookins;
     }
 
     public int getDriverId() {
-        return DriverId;
+        return driverId;
     }
 
     public void setDriverId(int driverId) {
-        DriverId = driverId;
+        this.driverId = driverId;
     }
 
     public String getMobile() {
@@ -55,5 +51,21 @@ public class Driver{
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Cab getCab() {
+        return cab;
+    }
+
+    public void setCab(Cab cab) {
+        this.cab = cab;
+    }
+
+    public List<TripBooking> getTripBookingList() {
+        return tripBookingList;
+    }
+
+    public void setTripBookingList(List<TripBooking> tripBookingList) {
+        this.tripBookingList = tripBookingList;
     }
 }

@@ -1,5 +1,6 @@
 package com.driver.services.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +17,7 @@ import com.driver.repository.DriverRepository;
 
 @Service
 public class AdminServiceImpl implements AdminService {
+
 	@Autowired
 	AdminRepository adminRepository1;
 
@@ -34,31 +36,36 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public Admin updatePassword(Integer adminId, String password) {
 		//Update the password of admin with given id
-		Admin admin = adminRepository1.findById(adminId).get();
-		admin.setPassword(password);
+		Optional<Admin> admin = adminRepository1.findById(adminId);
+		if(admin.isPresent()){
+			admin.get().setPassword(password);
+			return adminRepository1.save(admin.get());
+		}
+		return null;
 
-		admin = adminRepository1.save(admin);
-		return admin;
 	}
 
 	@Override
 	public void deleteAdmin(int adminId){
 		// Delete admin without using deleteById function
-		Admin admin =  adminRepository1.findById(adminId).get();
+		Optional<Admin> optionalAdmin = adminRepository1.findById(adminId);
+		if(!optionalAdmin.isPresent())
+			return;
+		Admin admin = optionalAdmin.get();
 		adminRepository1.delete(admin);
+
 	}
 
 	@Override
 	public List<Driver> getListOfDrivers() {
 		//Find the list of all drivers
-		List<Driver> driverlist = driverRepository1.findAll();
-		return driverlist;
+		return driverRepository1.findAll();
 	}
 
 	@Override
 	public List<Customer> getListOfCustomers() {
 		//Find the list of all customers
-		List<Customer>customer = customerRepository1.findAll();
-		return customer;
+		return customerRepository1.findAll();
 	}
+
 }

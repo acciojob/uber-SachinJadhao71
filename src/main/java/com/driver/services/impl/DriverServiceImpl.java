@@ -13,39 +13,68 @@ import java.util.Optional;
 
 @Service
 public class DriverServiceImpl implements DriverService {
+
 	@Autowired
 	DriverRepository driverRepository3;
 
 	@Autowired
 	CabRepository cabRepository3;
 
+
 	@Override
 	public void register(String mobile, String password){
 		//Save a driver in the database having given details and a cab with ratePerKm as 10 and availability as True by default.
+//		Driver driver = new Driver();
+//		driver.setMobile(mobile);
+//		driver.setPassword(password);
+//		Driver savedDriver = driverRepository3.save(driver);
+//		Cab cab = new Cab();
+//		cab.setAvailability(true);
+//		cab.setPerKmRate(10);
+//		cab.setDriver(driver);
+//		savedDriver.setCab(cab);
+		//we are saving the parent(driver) so automatically child(cab) also saved in the database
+//		driverRepository3.save(savedDriver);
+
 		Driver driver = new Driver();
 		driver.setMobile(mobile);
 		driver.setPassword(password);
+		Driver savedDriver = driverRepository3.save(driver);
+
+		// Prepare cab object;
 		Cab cab = new Cab();
 		cab.setPerKmRate(10);
 		cab.setAvailable(true);
-		cab.setDriver(driver);
-		driver.setCab(cab);
-		driverRepository3.save(driver);
+		cab.setDriver(savedDriver);
+//		Cab savedCab = cabRepository3.save(cab);
+
+		// Update the driver entity
+		savedDriver.setCab(cab);
+		driverRepository3.save(savedDriver);
+
 	}
 
 	@Override
 	public void removeDriver(int driverId){
 		// Delete driver without using deleteById function
-		Driver drvr = driverRepository3.findById(driverId).get();
-		driverRepository3.delete(drvr);
+		Optional<Driver> optionalDriver = driverRepository3.findById(driverId);
+		if(optionalDriver.isPresent()==false)return;
+		Driver driver = optionalDriver.get();
+		Cab cab = driver.getCab();
+		cabRepository3.delete(cab);
+		driverRepository3.delete(driver);
 	}
 
 	@Override
 	public void updateStatus(int driverId){
 		//Set the status of respective car to unavailable
-		Driver driver = driverRepository3.findById(driverId).get();
-		Cab cab =driver.getCab();
+		Optional<Driver> optionalDriver = driverRepository3.findById(driverId);
+		if(optionalDriver.isPresent()==false)return;
+		Driver driver = optionalDriver.get();
+		Cab cab = driver.getCab();
 		cab.setAvailable(false);
+
 		cabRepository3.save(cab);
+
 	}
 }
